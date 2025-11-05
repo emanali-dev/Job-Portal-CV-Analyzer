@@ -13,7 +13,8 @@ The system analyzes uploaded CVs against job descriptions using **string matchin
 - Frontend built with **HTML, CSS, JavaScript**  
 - Backend powered by **Python (Flask)**  
 
-
+## 📂 Folder Structure
+```plaintext
 Job-Portal-CV-Analyzer/
 │
 ├── app.py                 # Main Flask application (entry point)
@@ -29,4 +30,5 @@ Job-Portal-CV-Analyzer/
 ├── DataSet/               # Contains sample or batch CV data for testing
 │
 └── results/               # Stores analysis and performance results
+
 
