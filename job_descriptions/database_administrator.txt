@@ -1,0 +1,1 @@
+SQL, MySQL, PostgreSQL, Oracle, Database Design, Normalization, Backup and Recovery, Performance Tuning, Data Security, Shell Scripting

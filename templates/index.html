@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>CV Analyzer - Batch Analysis</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="logo">CV Analyzer</div>
+    <input type="checkbox" id="menu-toggle">
+    <label for="menu-toggle" class="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </label>
+    <ul class="nav-links">
+      <li><a href="/home">Home</a></li>
+      <li><a href="/single">Analyze CV</a></li>
+      <li><a href="/batch">Batch Analysis</a></li>
+      <li><a href="/about">About</a></li>
+      <li><a href="/login">Login</a></li>
+    </ul>
+  </nav>
+
+  <div class="card">
+    <h2>Batch CV Analyzer</h2>
+
+    <h3>Run batch analysis for all CVs in dataset</h3>
+
+    <label>Choose role for batch analysis</label>
+    <select id="batchRole">
+      <option value="">-- Select role for batch --</option>
+      <option value="data_scientist">Data Scientist</option>
+      <option value="web_developer">Web Developer</option>
+      <option value="software_tester">Software Tester</option>
+      <option value="fullstack_developer">Full Stack Developer</option>
+      <option value="machine_learning_engineer">Machine Learning Engineer</option>
+      <option value="data_analyst">Data Analyst</option>
+      <option value="backend_developer">Backend Developer</option>
+      <option value="frontend_developer">Frontend Developer</option>
+      <option value="mobile_app_developer">Mobile App Developer</option>
+      <option value="devops_engineer">DevOps Engineer</option>
+      <option value="cloud_engineer">Cloud Engineer</option>
+      <option value="ai_engineer">AI Engineer</option>
+      <option value="cyber_security_analyst">Cyber Security Analyst</option>
+      <option value="software_engineer">Software Engineer</option>
+      <option value="game_developer">Game Developer</option>
+      <option value="ui_ux_designer">UI/UX Designer</option>
+      <option value="blockchain_developer">Blockchain Developer</option>
+      <option value="database_administrator">Database Administrator</option>
+      <option value="network_engineer">Network Engineer</option>
+    </select>
+
+    <label>Or enter custom keywords (comma-separated):</label>
+    <input type="text" id="batchKeywords" placeholder="e.g. Python, SQL, Tableau">
+
+    <button id="batchBtn">Run Batch Analysis</button>
+
+    <h3>Batch Analysis Results</h3>
+    <div id="batchResultsContainer" class="table-container" style="display:none;">
+      <table id="batchResultsTable" class="dashboard-table">
+        <thead>
+          <tr>
+            <th>Candidate</th>
+            <th>Average Relevance (%)</th>
+            <th>View CV</th>
+            <th>Performance Analysis</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <h3>Result:</h3>
+    <pre id="output" class="card" style="background:#f0f8ff; padding:15px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.1);">
+Waiting for input...
+    </pre>
+  </div>
+
+
+   <!-- Footer -->
+  <footer class="footer">
+    <p>© 2025 CV Analyzer Portal | Developed by Your Team</p>
+  </footer>
+  <script>
+const output = document.getElementById('output');
+const batchResultsContainer = document.getElementById('batchResultsContainer');
+const tbody = document.querySelector("#batchResultsTable tbody");
+
+async function safeParseTextResponse(resp){
+  const text = await resp.text();
+  try { return JSON.parse(text); }
+  catch(e) { throw new Error("Server returned non-JSON: " + text.slice(0,300)); }
+}
+
+// -------------------- Batch Analysis --------------------
+document.getElementById('batchBtn').addEventListener('click', async () => {
+  const role = document.getElementById('batchRole').value;
+  const keywords = document.getElementById('batchKeywords').value;
+  output.textContent = "Running batch analysis...";
+
+  try {
+    const res = await fetch('/batch_runner', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ role, keywords })
+    });
+
+    const json = await safeParseTextResponse(res);
+
+    if(json.error){
+      output.textContent = "❌ " + json.error;
+      return;
+    }
+
+    tbody.innerHTML = "";
+
+    // 🔹 Filter out irrelevant (0%) candidates
+    let relevantCandidates = json.results.filter(c => c["Average Relevance"] > 0);
+
+    // 🔹 Sort by relevance descending
+    relevantCandidates.sort((a, b) => b["Average Relevance"] - a["Average Relevance"]);
+
+    if (relevantCandidates.length === 0) {
+      output.textContent = "⚠️ No relevant CVs found (all scored 0%).";
+      batchResultsContainer.style.display = "none";
+      return;
+    }
+
+    output.textContent = `✅ Batch completed! ${relevantCandidates.length} relevant CVs found (filtered).`;
+
+    relevantCandidates.forEach(candidate => {
+      const tr = document.createElement("tr");
+
+      // Candidate name
+      const nameTd = document.createElement("td");
+      nameTd.textContent = candidate.candidate;
+      tr.appendChild(nameTd);
+
+      // Relevance bar
+      const relevanceTd = document.createElement("td");
+      const barContainer = document.createElement("div");
+      barContainer.style.background = "#e0e0e0";
+      barContainer.style.borderRadius = "8px";
+      barContainer.style.overflow = "hidden";
+      barContainer.style.height = "18px";
+      barContainer.style.width = "100%";
+
+      const bar = document.createElement("div");
+      bar.style.height = "100%";
+      bar.style.width = candidate["Average Relevance"] + "%";
+      bar.style.background = "#4e73df";
+      bar.style.transition = "width 0.5s";
+      bar.textContent = candidate["Average Relevance"] + "%";
+      bar.style.color = "white";
+      bar.style.fontWeight = "bold";
+      bar.style.textAlign = "center";
+      bar.style.fontSize = "0.8rem";
+      bar.style.lineHeight = "18px";
+
+      barContainer.appendChild(bar);
+      relevanceTd.appendChild(barContainer);
+      tr.appendChild(relevanceTd);
+
+      // CV Link
+      const cvTd = document.createElement("td");
+      const cvLink = document.createElement("a");
+      cvLink.href = `/dataset/${encodeURIComponent(candidate.filename)}`;
+      cvLink.target = "_blank";
+      cvLink.textContent = "Open CV";
+      cvTd.appendChild(cvLink);
+      tr.appendChild(cvTd);
+
+      // Performance Analysis link
+      const perfTd = document.createElement("td");
+      const perfLink = document.createElement("a");
+      const kws = keywords.split(',').map(k => k.trim());
+      perfLink.href = `/performance/${encodeURIComponent(candidate.filename)}?keywords=${encodeURIComponent(kws.join(','))}`;
+      perfLink.target = "_blank";
+      perfLink.textContent = "Performance Analysis";
+      perfTd.appendChild(perfLink);
+      tr.appendChild(perfTd);
+
+      tbody.appendChild(tr);
+    });
+
+    batchResultsContainer.style.display = "block";
+
+  } catch (err) {
+    output.textContent = "Error: " + err.message;
+    console.error(err);
+  }
+});
+
+// -------------------- Auto-load role keywords --------------------
+document.getElementById('batchRole').addEventListener('change', async (e) => {
+  const r = e.target.value;
+  if(!r) return;
+  try {
+    const resp = await fetch('/keywords?role=' + encodeURIComponent(r));
+    const data = await resp.json();
+    document.getElementById('batchKeywords').value = (data.keywords || []).join(', ');
+    output.textContent = `Loaded ${data.keywords.length || 0} keywords for ${r}`;
+  } catch(err){
+    console.error(err);
+  }
+});
+</script>
+
+
+</body>
+</html>

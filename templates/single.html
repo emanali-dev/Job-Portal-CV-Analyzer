@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Single CV Analyzer</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="logo">CV Analyzer</div>
+    <input type="checkbox" id="menu-toggle">
+    <label for="menu-toggle" class="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </label>
+    <ul class="nav-links">
+       <li><a href="/">Home</a></li>
+  <li><a href="/single">Analyze CV</a></li>
+  <li><a href="/batch">Batch Analysis</a></li>
+  <li><a href="/about">About</a></li>
+  <li><a href="/login">Login</a></li>
+    </ul>
+  </nav>
+
+  <div class="card">
+    <h2>Single CV Analyzer</h2>
+
+    <form id="analyzeForm" enctype="multipart/form-data">
+      <label>Upload CV (PDF/DOCX)</label>
+      <input type="file" name="cv" id="cvfile" required>
+
+      <label>Select job role (auto-loads keywords)</label>
+      <select id="roleSelect" name="role">
+        <option value="">-- Select role (optional) --</option>
+        <option value="data_scientist">Data Scientist</option>
+        <option value="web_developer">Web Developer</option>
+        <option value="software_tester">Software Tester</option>
+        <option value="fullstack_developer">Full Stack Developer</option>
+        <option value="machine_learning_engineer">Machine Learning Engineer</option>
+        <option value="data_analyst">Data Analyst</option>
+        <option value="backend_developer">Backend Developer</option>
+        <option value="frontend_developer">Frontend Developer</option>
+        <option value="mobile_app_developer">Mobile App Developer</option>
+        <option value="devops_engineer">DevOps Engineer</option>
+        <option value="cloud_engineer">Cloud Engineer</option>
+        <option value="ai_engineer">AI Engineer</option>
+        <option value="cyber_security_analyst">Cyber Security Analyst</option>
+        <option value="software_engineer">Software Engineer</option>
+        <option value="game_developer">Game Developer</option>
+        <option value="ui_ux_designer">UI/UX Designer</option>
+        <option value="blockchain_developer">Blockchain Developer</option>
+        <option value="database_administrator">Database Administrator</option>
+        <option value="network_engineer">Network Engineer</option>
+      </select>
+
+      <label>Or enter custom keywords (comma-separated)</label>
+      <textarea name="keywords" id="keywords" placeholder="e.g. Python, SQL, Machine Learning"></textarea>
+
+      <button type="submit">Analyze CV</button>
+    </form>
+
+    <h3>Result:</h3>
+
+    <!-- Table container -->
+    <div id="resultContainer" class="table-container" style="display:none;">
+      <table class="dashboard-table">
+        <thead>
+          <tr>
+            <th>Algorithm</th>
+            <th>Comparisons</th>
+            <th>Execution Time (s)</th>
+            <th>Relevance (%)</th>
+            <th>Matched Skills</th>
+            <th>Missing Skills</th>
+          </tr>
+        </thead>
+        <tbody id="resultBody"></tbody>
+      </table>
+    </div>
+
+    <!-- Raw text fallback -->
+    <pre id="output" class="card" style="background:#f0f8ff; padding:15px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.1);">
+Waiting for input...
+    </pre>
+  </div>
+
+
+   <!-- Footer -->
+  <footer class="footer">
+    <p>© 2025 CV Analyzer Portal | Developed by Your Team</p>
+  </footer>
+
+  
+  <script>
+  const output = document.getElementById('output');
+  const resultContainer = document.getElementById('resultContainer');
+  const resultBody = document.getElementById('resultBody');
+  const analyzeForm = document.getElementById('analyzeForm');
+
+  async function safeParseTextResponse(resp){
+    const text = await resp.text();
+    try { return JSON.parse(text); }
+    catch(e) { throw new Error("Server returned non-JSON: " + text.slice(0,300)); }
+  }
+
+  analyzeForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    output.textContent = "Analyzing CV...";
+    resultContainer.style.display = "none";
+    const fd = new FormData(analyzeForm);
+
+    try {
+      const res = await fetch('/analyze', { method: 'POST', body: fd });
+      const json = await safeParseTextResponse(res);
+      output.textContent = "✅ Analysis complete!";
+      renderTable(json);
+    } catch (err) {
+      output.textContent = "Error: " + err.message;
+      console.error(err);
+    }
+  });
+
+  function renderTable(data){
+    resultBody.innerHTML = "";
+    Object.entries(data).forEach(([algo, vals]) => {
+      const tr = document.createElement("tr");
+
+      tr.innerHTML = `
+        <td>${algo}</td>
+        <td>${vals["Comparisons"]}</td>
+        <td>${vals["Execution Time (s)"].toFixed(6)}</td>
+        <td>
+          <div style="width:100%; background:#eee; border-radius:5px; overflow:hidden;">
+            <div style="width:${vals["Relevance (%)"]}%; background:#1cc88a; color:white; text-align:center; padding:3px 0;">
+              ${vals["Relevance (%)"].toFixed(2)}%
+            </div>
+          </div>
+        </td>
+        <td>${vals["Matched Skills"].join(", ")}</td>
+        <td>${vals["Missing Skills"].join(", ")}</td>
+      `;
+      resultBody.appendChild(tr);
+    });
+
+    resultContainer.style.display = "block";
+  }
+
+  // Auto-load role keywords
+  document.getElementById('roleSelect').addEventListener('change', async (e) => {
+    const r = e.target.value;
+    if(!r) return;
+    try {
+      const resp = await fetch('/keywords?role=' + encodeURIComponent(r));
+      const data = await resp.json();
+      document.getElementById('keywords').value = (data.keywords || []).join(', ');
+      output.textContent = `Loaded ${data.keywords.length || 0} keywords for ${r}`;
+    } catch(err){
+      console.error(err);
+    }
+  });
+  </script>
+</body>
+</html>

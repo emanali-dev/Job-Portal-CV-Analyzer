@@ -1,0 +1,1 @@
+TensorFlow, PyTorch, Neural Networks, CNN, RNN, GAN, Keras, GPU, Python, Model Optimization, Image Recognition

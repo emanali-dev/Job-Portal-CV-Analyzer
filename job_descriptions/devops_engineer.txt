@@ -1,0 +1,1 @@
+Linux, Docker, Kubernetes, Jenkins, CI/CD, GitHub Actions, Terraform, AWS, Azure, Bash Scripting, Monitoring, Ansible

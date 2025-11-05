@@ -1,0 +1,1 @@
+Manual Testing, Automation Testing, Selenium, JUnit, TestNG, Bug Tracking, QA, SDLC, STLC, Postman, Regression Testing

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Home | CV Analyzer Portal</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="logo">CV Analyzer</div>
+    <input type="checkbox" id="menu-toggle">
+    <label for="menu-toggle" class="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </label>
+    <ul class="nav-links">
+      <li><a href="/home">Home</a></li>
+      <li><a href="/single">Analyze CV</a></li>
+      <li><a href="/batch">Batch Analysis</a></li>
+      <li><a href="/about">About</a></li>
+      <li><a href="/login">Login</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Welcome to the Intelligent CV Analyzer Portal</h1>
+      <p>Empowering recruiters and HR professionals to analyze resumes efficiently with AI-driven insights.</p>
+      <div class="hero-buttons">
+        <a href="/single" class="btn-primary">Analyze a Single CV</a>
+        <a href="/batch" class="btn-secondary">Run Batch Analysis</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features">
+    <h2>What You Can Do</h2>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h3>🔍 CV Analyzer</h3>
+        <p>Upload a candidate's resume and instantly get matched skills, missing skills, and relevance percentage.</p>
+      </div>
+      <div class="feature-card">
+        <h3>📊 Batch Analysis</h3>
+        <p>Evaluate multiple CVs at once for a specific role or keyword set and compare candidate performance visually.</p>
+      </div>
+      <div class="feature-card">
+        <h3>⚙️ Algorithm Insights</h3>
+        <p>View detailed performance of algorithms (Brute Force, KMP, Rabin-Karp) used to analyze resume text efficiently.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta">
+    <h2>Get Started Today</h2>
+    <p>Transform your hiring process with automated resume insights and skill matching.</p>
+    <a href="/login" class="btn-primary">Login to Begin</a>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>© 2025 CV Analyzer Portal | Developed by Your Team</p>
+  </footer>
+
+</body>
+</html>

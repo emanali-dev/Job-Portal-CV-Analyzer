@@ -1,0 +1,1 @@
+Python, Machine Learning, Deep Learning, Data Analysis, Pandas, NumPy, Statistics, SQL, TensorFlow, Scikit-learn, Power BI, Data Visualization

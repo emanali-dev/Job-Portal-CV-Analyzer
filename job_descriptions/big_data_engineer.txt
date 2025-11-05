@@ -1,0 +1,1 @@
+Hadoop, Spark, Hive, Pig, Kafka, Scala, Python, MapReduce, ETL, SQL, Data Pipelines

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Performance Analysis - {{ filename }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="logo">CV Analyzer</div>
+    <input type="checkbox" id="menu-toggle">
+    <label for="menu-toggle" class="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </label>
+  <ul class="nav-links">
+       <li><a href="/">Home</a></li>
+  <li><a href="/single">Analyze CV</a></li>
+  <li><a href="/batch">Batch Analysis</a></li>
+  <li><a href="/about">About</a></li>
+  <li><a href="/login">Login</a></li>
+    </ul>
+  </nav>
+<div class="card">
+    <h2>Performance Analysis: {{ candidate }}</h2>
+    <p><strong>Keywords:</strong> {{ keywords|join(', ') }}</p>
+
+    <!-- Combined Execution Time & Comparisons Chart -->
+    <h3>Execution Time & Comparisons</h3>
+    <div class="chart-container" style="width:700px; margin:auto;">
+        <canvas id="perfChart" width="700" height="300"></canvas>
+    </div>
+
+    <!-- Matched & Missing Skills -->
+    <h3>Matched Skills</h3>
+    <div class="table-container">
+        <table class="dashboard-table">
+            <thead>
+                <tr>
+                    <th>Algorithm</th>
+                    <th>Matched Skills</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for alg, vals in results.items() %}
+                <tr>
+                    <td>{{ alg }}</td>
+                    <td>{{ vals["Matched Skills"]|join(', ') }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <h3>Missing Skills</h3>
+    <div class="table-container">
+        <table class="dashboard-table">
+            <thead>
+                <tr>
+                    <th>Algorithm</th>
+                    <th>Missing Skills</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for alg, vals in results.items() %}
+                <tr>
+                    <td>{{ alg }}</td>
+                    <td>{{ vals["Missing Skills"]|join(', ') }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <p><a href="/dataset/{{ filename }}" target="_blank" class="cv-link">View CV</a></p>
+</div>
+
+
+ <!-- Footer -->
+  <footer class="footer">
+    <p>© 2025 CV Analyzer Portal | Developed by Your Team</p>
+  </footer>
+  
+<script>
+    const performanceResults = {{ results|tojson }};
+    const algorithms = Object.keys(performanceResults);
+
+    // Execution Time & Comparisons Dual Axis Chart
+    const execTimes = algorithms.map(a => performanceResults[a]["Execution Time (s)"]);
+    const comparisons = algorithms.map(a => performanceResults[a]["Comparisons"]);
+    const ctx = document.getElementById('perfChart').getContext('2d');
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: algorithms,
+            datasets: [
+                {
+                    label: 'Execution Time (s)',
+                    data: execTimes,
+                    backgroundColor: '#4e73df',
+                    yAxisID: 'y1'
+                },
+                {
+                    label: 'Comparisons',
+                    data: comparisons,
+                    backgroundColor: '#1cc88a',
+                    yAxisID: 'y2'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { position: 'top' } },
+            scales: {
+                y1: { type: 'linear', position: 'left', beginAtZero: true, title: { display: true, text: 'Execution Time (s)' } },
+                y2: { type: 'linear', position: 'right', beginAtZero: true, title: { display: true, text: 'Comparisons' }, grid: { drawOnChartArea: false } }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

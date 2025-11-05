@@ -1,0 +1,1 @@
+HTML, CSS, JavaScript, React, Angular, Vue.js, TypeScript, Bootstrap, Figma, Responsive Design, Git

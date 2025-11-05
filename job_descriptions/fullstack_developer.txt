@@ -1,0 +1,1 @@
+HTML, CSS, JavaScript, React, Node.js, Express, MongoDB, SQL, Python, Git, REST APIs, Docker, AWS
