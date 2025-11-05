@@ -16,10 +16,17 @@ The system analyzes uploaded CVs against job descriptions using **string matchin
 
 Job-Portal-CV-Analyzer/
 │
-├── app.py                 # Main Flask app
-├── templates/             # HTML templates
-├── static/                # CSS, JS files
-├── utils/                 # Algorithms and helper scripts
-├── uploads/               # Uploaded CVs
-├── DataSet/               # Test CV dataset
-└── results/               # Output and analysis results
+├── app.py                 # Main Flask application (entry point)
+│
+├── templates/             # HTML templates (home, single, batch, performance, etc.)
+│
+├── static/                # Frontend assets: CSS, JS, images
+│
+├── utils/                 # Core logic: string matching algorithms and helper functions
+│
+├── uploads/               # Folder for uploaded CVs
+│
+├── DataSet/               # Contains sample or batch CV data for testing
+│
+└── results/               # Stores analysis and performance results
+
